@@ -28,5 +28,10 @@ export async function getFlights() {
       'Content-Type': 'application/json',
     },
   });
+  const flightsInfo = await response.json()
+  console.log(flightsInfo)
+  if (response.status >= 400) {
+    throw new Error(`Error Code: ${response.status}, ${flightsInfo?.message ?? ''}`)
+  }
   return response.json() as unknown as FlightInfo[]
 }

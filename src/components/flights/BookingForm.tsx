@@ -1,15 +1,16 @@
 'use client'
 
-import Button from '@/components/Button'
-import Input from '@/components/Input'
+import Button from '@/components/common/Button'
+import Input from '@/components/common/Input'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { useFlightsQuery } from '@/hooks/useFlightsQuery';
 import { DevTool } from '@hookform/devtools'
-import Loading from './Loading';
-import FlightNotFound from '@/components/FlightNotFound';
-import SubmissionSuccessful from '@/components/SubmissionSuccessful';
-import TextArea from '@/components/TextArea';
+import Loading from '@/components/common/Loading';
+import FlightNotFound from '@/components/flights/FlightNotFound';
+import SubmissionSuccessful from '@/components/flights/SubmissionSuccessful';
+import TextArea from '@/components/common/TextArea';
 import { useState } from 'react';
+import SubmissionFailed from '@/components/flights/SubmissionFailed';
 
 interface FormInputs {
   flightNumber: string;
@@ -20,18 +21,15 @@ interface FormInputs {
 }
 
 export default function BookingForm() {
-  const { getValues, register, handleSubmit, formState: { errors }, control, setError } = useForm<FormInputs>({ mode: 'onChange' });
+  const { getValues, register, handleSubmit, formState: { errors }, control } = useForm<FormInputs>({ mode: 'onChange' });
   const { data, error, isLoading, isError, isSuccess } = useFlightsQuery();
   const [showNotFound, setShowNotFound] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false)
 
   const onSubmit: SubmitHandler<FormInputs> = (formData) => {
-    if (isError) {
-      setError('flightNumber', {
-        type: 'manual',
-        message: (error as Error).message,
-      });
-      setShowNotFound(true);
+    if (isError || (data as any).message) {
+      setShowError(true);
     } else if (isSuccess && data?.find(x => Number(x.FlightNumber) === Number(formData.flightNumber) && x.AirlineID.toLowerCase() === formData.idNumber.toLowerCase())) {
       setShowSuccess(true);
     } else {
@@ -107,12 +105,13 @@ export default function BookingForm() {
         />
 
         {<Loading isOpen={isLoading} onClose={() => {}} />}
-        {isError && <div className="text-red-600">{(error as Error).message}</div>}
+        {/* {isError && <div className="text-red-600">{(error as Error).message}</div>} */}
 
         <Button className="w-full" type="submit">下一步</Button>
       </form>
       <FlightNotFound isOpen={showNotFound} onClose={() => { setShowNotFound(false) }} flightNumber={`${getValues('flightNumber')}`} onRetry={handleRetry} onSubmit={handleConfirm} />
       <SubmissionSuccessful isOpen={showSuccess} onClose={() => { setShowSuccess(false) }} />
+      <SubmissionFailed isOpen={showError} onClose={() => { setShowError(false) }} message={(error as Error)?.message ?? (data as any)?.message} />
       <DevTool control={control} />
     </>
   );

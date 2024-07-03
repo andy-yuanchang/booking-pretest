@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from '@/components/Modal';
+import Modal from '@/components/common/Modal';
 
 interface FlightNotFoundProps {
   isOpen: boolean;
@@ -12,7 +12,9 @@ interface FlightNotFoundProps {
 const FlightNotFound: React.FC<FlightNotFoundProps> = ({ isOpen, flightNumber, onRetry, onSubmit, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col items-center justify-center min-h-48">
+      <div className="absolute bottom-0 sm:static bg-white rounded-lg p-4 z-10 max-w-full sm:max-w-md mx-auto w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="flex flex-col items-center justify-center min-h-48">
+        </div>
         <p className="text-lg font-semibold text-red-600">查不到「{flightNumber}」航班資訊</p>
         <p className="mt-2 text-gray-600">請確認航班資訊，趕局時務等。你也可以直接填寫寄此航班作為聯繫送出資訊。</p>
         <div className="mt-4 space-x-2">

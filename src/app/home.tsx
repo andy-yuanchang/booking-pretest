@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import BookingForm from '@/components/BookingForm'
+import BookingForm from '@/components/flights/BookingForm'
 
 const Home: NextPage = () => {
   return (
